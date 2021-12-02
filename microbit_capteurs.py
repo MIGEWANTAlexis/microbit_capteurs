@@ -13,7 +13,7 @@ radioProtocol   = protocol.RadioProtocol(2)
 '''
  * init comm
 '''
-radio.config(group = 2,length=32) # Par défaut la taille fait 32 faut changer la config pour la taille des messages a envoyer (mettre 256)
+radio.config(group = 2, length = 251)
 radio.on()
 
 while True:
