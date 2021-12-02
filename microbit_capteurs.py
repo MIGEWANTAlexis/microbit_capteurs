@@ -16,6 +16,9 @@ radioProtocol   = protocol.RadioProtocol(2)
 radio.config(group = 2, length = 251)
 radio.on()
 
+'''
+ * main program
+'''
 while True:
     '''
      * local variables for main
