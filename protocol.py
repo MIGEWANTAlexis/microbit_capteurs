@@ -1,50 +1,41 @@
 import radio
 
 class RadioProtocol:
-    def __init__(self, address):
+    def __init__(self, address, shiftPattern):
         self.addr = address
+        self.shiftPattern = shiftPattern
         return None
 
-    def calculateChecksum(self, message):
-        nleft = len(message)
-        sum = 0
-        pos = 0
-        while nleft > 1:
-            sum = ord(message[pos]) * 256 + (ord(message[pos + 1]) + sum)
-            pos = pos + 2
-            nleft = nleft - 2
-        if nleft == 1:
-            sum = sum + ord(message[pos]) * 256
-
-        sum = (sum >> 16) + (sum & 0xFFFF)
-        sum += (sum >> 16)
-        sum = (~sum & 0xFFFF)
-
-        return sum
-    
+    # Sends a packet following a specific format
     def sendPacket(self, message, addrDest):
         if len(message)<251:
-            radio.send_bytes("" + str(self.addr) + "|" + str(len(message)) + "|" + str(addrDest) + "|" + message + "|" + str(self.calculateChecksum(message)))
+            radio.send_bytes("" + str(self.addr) + "|" + str(len(message)) + "|" + str(addrDest) + "|" + self.encrypt(message))
 
+    # Receives a packet, checks if has the number of values it should, and if it does returns the message (according the addrDest matches the address of the device receiving the message)
     def receivePacket(self, packet):
         if packet is None:
             return 0
         else:
             tabRes = packet.format(1).split("|")
-            stuff = dict()
-            stuff['addrInc'] = tabRes[0]
-            stuff['lenMess'] = tabRes[1]
-            stuff['addrDest'] = tabRes[2]
-            stuff['message'] = tabRes[3]
-            stuff['receivedCheckSum'] = tabRes[4]
-            if self.verifyCheckSum(stuff['receivedCheckSum'], self.calculateChecksum(stuff['message'])):
-                if self.addr == int(stuff['addrDest']):
-                    return stuff['message']
+            if len(tabRes) != 4 :
+                return -1
+            data = dict()
+            data['addrInc'] = tabRes[0]
+            data['lenMess'] = tabRes[1]
+            data['addrDest'] = tabRes[2]
+            if self.addr == int(data['addrDest']):
+                data['message'] = self.decrypt(tabRes[3])
+                return data['message']
             return -1
-    
-    def verifyCheckSum(self, checkSum, receivedCheckSum):
-        if int(checkSum) == receivedCheckSum:
-            return True
-        else:
-            return False
 
+    def encrypt(self, msg):
+        res = ""
+        for i in range(len(msg)):
+            res += chr(ord(msg[i])+self.shiftPattern)
+        return res
+
+    def decrypt(self, msg):
+        res = ""
+        for i in range(len(msg)):
+            res += chr(ord(msg[i])-self.shiftPattern)
+        return res
