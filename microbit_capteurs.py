@@ -36,11 +36,8 @@ while True:
     if msg:
         new_msg = msg.replace("'", "")
         new_msg = new_msg[1:]
-        if new_msg == 'TL':
-            sens = 'TL'
-        else:
-            sens = 'LT'
-            
+        sens = new_msg
+    
     if sens == 'TL':
         add_text(0, 0, "Temp :" + str(temp))
         add_text(0, 1, "Lum :" + str(lum))
