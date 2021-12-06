@@ -8,7 +8,7 @@ from ssd1306_text import add_text
  * variables for script
 '''
 i2c             = i2c.init(freq = 10000, scl = pin19, sda = pin20)
-radioProtocol   = protocol.RadioProtocol(2)
+radioProtocol   = protocol.RadioProtocol(2, 3)
 
 '''
  * init comm
