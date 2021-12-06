@@ -16,6 +16,8 @@ radioProtocol   = protocol.RadioProtocol(2, 3)
 radio.config(group = 2, length = 251)
 radio.on()
 
+sens = "TL"
+
 '''
  * main program
 '''
@@ -27,7 +29,7 @@ while True:
     lum = display.read_light_level()
     temp = temperature()
     msgToSend = 'l:' + str(lum) + ',t:' + str(temp) + "\t"
-
+    
     initialize(pinReset = pin0)
     clear_oled()
     radioProtocol.sendPacket(msgToSend, 1)
@@ -35,9 +37,14 @@ while True:
         new_msg = msg.replace("'", "")
         new_msg = new_msg[1:]
         if new_msg == 'TL':
-            add_text(0, 0, "Temp :" + str(temp))
-            add_text(0, 1, "Lum :" + str(lum))
+            sens = 'TL'
         else:
-            add_text(0, 0, "Lum :" + str(lum))
-            add_text(0, 1, "Temp :" + str(temp))
+            sens = 'LT'
+            
+    if sens == 'TL':
+        add_text(0, 0, "Temp :" + str(temp))
+        add_text(0, 1, "Lum :" + str(lum))
+    else:
+        add_text(0, 0, "Lum :" + str(lum))
+        add_text(0, 1, "Temp :" + str(temp))
     sleep(1000)
